@@ -1,0 +1,54 @@
+{% extends 'main/base.html' %} {% block title %}Home Page{% endblock %} 
+{% block content %}
+<!--<div id="liveAlertPlaceholder"><div><div class="alert alert-success alert-dismissible" role="alert"><div>Post deleted successfully!</div><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div></div>-->
+{% for post in posts %}
+<div class="card mt-2">
+  <div class="card-header"><strong>@{{ post.author.username }}</strong></div>
+  <div class="card-body d-flex flex-row justify-content-between">
+    <div>
+      <h5 class="card-title">{{post.title}}</h5>
+      <p>{{post.description}}</p>
+    </div>
+    <div>
+      {% if user == post.author or perms.main.delete_post %}
+      <form method="post">{% csrf_token %}
+        <!-- Button trigger modal -->
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+          Delete
+        </button>
+
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                Are you sure you want to delete "{{ post.title }}"?
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger" name="post-id" value="{{post.id}}">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+      {% endif %}
+      {% if user.is_staff %}
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-warning" name="user-id" value="{{post.author.id}}">
+          Ban User
+        </button>
+      </form>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-footer text-muted">{{post.created_at}}</div>
+</div>
+{% empty %}
+<p>No posts yet :(</p>
+{% endfor %} {% endblock %}
